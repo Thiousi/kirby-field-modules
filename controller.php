@@ -5,14 +5,26 @@ class ModulesFieldController extends Kirby\Panel\Controllers\Field {
   protected $options = array();
   protected $origin = null;
 
+  public function __construct($model, $field) {
+    parent::__construct($model, $field);
+    $this->options = $this->field()->options();
+  }
+
   public function add() {
-    $this->options = $this->field($this->fieldname())->options;
-    
-    $templates = $this->templates();
     $origin = $this->origin();
     $page = $this->model();
 
-    $form = $this->form('add', array($origin, $page, $templates));
+    $form = $this->form('add', array($origin, $page));
+
+    $templates = array();
+
+    foreach($origin->blueprint()->pages()->template() as $template) {
+      $templates[] = array(
+        'options' => $this->options($template->name()),
+        'title' => $template->title(),
+        'name' => $template->name(),
+      );
+    }
 
     $options = array(
       'templates' => $templates,
@@ -31,23 +43,15 @@ class ModulesFieldController extends Kirby\Panel\Controllers\Field {
     return $this->modal('delete', compact('form'));
   }
 
-  public function templates() {
-    $templates = array();
-
-    foreach($this->origin()->blueprint()->pages()->template() as $template) {
-      $templates[] = array(
-        'options' => $this->options($template->name()),
-        'title' => $template->title(),
-        'name' => $template->name(),
-      );
-    }
-
-    return $templates;
+  public function duplicate() {
+    $page = $this->origin()->find(get('uid'));
+    $root = kirby()->roots()->content();
+    dump(dir::copy($root . DS . $page->diruri(), $root . DS . 'modules-test/modules/test'));
   }
 
-  public function field($name) {
+  public function field() {
     $fields = $this->model()->blueprint()->fields(null);
-    return $fields->get($name);
+    return $fields->get($this->fieldname());
   }
 
   public function origin() {
@@ -64,6 +68,7 @@ class ModulesFieldController extends Kirby\Panel\Controllers\Field {
     // Return from cache if possible
     if($this->defaults) return $this->defaults;
 
+    // Filter options for default values
     $defaults = array_filter($this->options, function($value) {
       return !is_array($value);
     });

@@ -9,9 +9,6 @@
       return template;
     });
 
-    console.log(options);
-    console.log(templates);
-
     form.on('submit', function(event) {
       var name = $('select[name="template"] option:selected', this).val();
       var template = templates.find(function(template) {

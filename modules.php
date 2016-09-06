@@ -52,6 +52,11 @@ class ModulesField extends BaseField {
         'method'  => 'get|post',
         'action'  => 'delete',
       ),
+      array(
+        'pattern' => 'duplicate',
+        'method'  => 'get|post',
+        'action'  => 'duplicate',
+      ),
     );
   }
 
@@ -59,6 +64,7 @@ class ModulesField extends BaseField {
     // Return from cache if possible
     if($this->defaults) return $this->defaults;
 
+    // Filter options for default values
     $defaults = array_filter($this->options, function($value) {
       return !is_array($value);
     });

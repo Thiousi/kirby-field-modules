@@ -11,6 +11,7 @@ class Module extends \Kirby\Modules\Module {
   protected $field;
   protected $page;
 
+  public $duplicate = true;
   public $redirect = false;
   public $preview = true;
   public $delete = true;
